@@ -1,0 +1,100 @@
+#!/bin/bash
+# cbpp-compton
+# Openbox Pipe Menu for use with compton compositor
+# Written for CrunchBang Linux <http://crunchbang.org/>
+# by Philip Newborough <corenominal@corenominal.org>
+# updated by Ben Young <computermouth@crunchbangplusplus.org>
+# for #!++ <https://crunchbangplusplus.org>
+
+# ------------- Set xcompmgr command options -----------------------------------
+if glxinfo | egrep -iq 'direct rendering: yes'; then
+    EXECXCOMP='compton --vsync opengl'
+else
+    EXECXCOMP='compton'
+fi
+
+# Edit xcompmgr settings
+if [ "$1" = "--edit" ]; then
+    if [ ! -f /home/$USER/.config/compton.conf ]; then
+        cp /etc/xdg/compton.conf /home/$USER/.config/compton.conf
+    fi
+    if [ -x "/usr/bin/geany" ]; then
+        geany /home/$USER/.config/compton.conf &
+    else
+        terminator --command="nano /home/$USER/.config/compton.conf"
+    fi
+    exit 0
+fi
+
+# Toggle compositing with compton. Called with "cbpp-compositor --toggle"
+if [ "$1" = "--toggle" ] || [ "$1" = "--start" ]; then 
+    if [ ! "$(pidof compton)" ]; then
+      $EXECXCOMP &
+    else
+      killall compton
+    fi
+    exit 0
+fi
+
+if [ "$1" = "--restart" ]; then
+    if [ "$(pidof compton)" ]; then
+        killall compton && sleep 1s
+        cbpp-compositor --start
+    fi
+    exit 0
+fi
+if [ "$1" = "--watch" ]; then
+    while inotifywait -e modify /home/$USER/.config/compton.conf; do
+        cbpp-compositor --restart
+    done
+    exit 0
+fi
+# Output Openbox menu
+if [ ! "$(pidof compton)" ]; then
+    cat << _EOF_
+    <openbox_pipe_menu>
+	    <item label="Enable Compositing">
+            <action name="Execute">
+				<command>
+					cbpp-compositor --start
+				</command>
+			</action>
+		</item>
+		<item label="Edit Compositing Settings">
+            <action name="Execute">
+				<command>
+					cbpp-compositor --edit
+				</command>
+			</action>
+		</item>
+    </openbox_pipe_menu>
+_EOF_
+else
+    cat << _EOF_
+    <openbox_pipe_menu>
+				<item label="Restart Compositing">
+					<action name="Execute">
+						<command>
+							cbpp-compositor --restart
+						</command>
+					</action>
+				</item>
+				<item label="Disable Compositing">
+					<action name="Execute">
+						<command>
+							cbpp-compositor --toggle
+						</command>
+					</action>
+				</item>
+                <separator/>
+                <item label="Edit Compositing Settings">
+                    <action name="Execute">
+                        <command>
+                            cbpp-compositor --edit
+                        </command>
+                    </action>
+                </item>
+    </openbox_pipe_menu>
+_EOF_
+fi
+exit 0
