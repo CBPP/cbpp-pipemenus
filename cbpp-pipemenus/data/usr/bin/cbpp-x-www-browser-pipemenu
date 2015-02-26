@@ -62,7 +62,7 @@ if [ "$1" = "--install-chromium-browser" ]; then
 		clear
         
         
-        if ! sudo apt-get install -y chromium-browser; then
+        if ! sudo apt-get install -y chromium; then
             clear
             echo ""
             echo "  There was a problem installing Chromium."
@@ -288,20 +288,20 @@ fi
 echo "    <openbox_pipe_menu>"
 
 # Chromium
-if [ -x "/usr/bin/chromium-browser" ];then
+if [ -x "/usr/bin/chromium" ];then
     I=$((I+1))
     cat << _menu_
 	    <item label="Chromium Browser">
             <action name="Execute">
 				<command>
-					chromium-browser
+					chromium
 				</command>
 			</action>
 		</item>
 		<item label="Chromium Browser (Private Mode)">
             <action name="Execute">
 				<command>
-					chromium-browser --incognito
+					chromium --incognito
 				</command>
 			</action>
 		</item>
