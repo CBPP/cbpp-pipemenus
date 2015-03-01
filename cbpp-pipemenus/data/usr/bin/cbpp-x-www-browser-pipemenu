@@ -11,8 +11,8 @@
 TOOLS=('chromium' 'iceweasel' 'google-chrome-stable' 'opera')
 # If the package needs additional configuration before installation simply create a function called setupBrowserName, it will be called automatically.
 
-KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key')
-KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key')
+KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbangplusplus.org/chrome.pub')
+KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbangplusplus.org/opera.key')
 
 if ! . cbpp-include.cfg 2> /dev/null; then
     say 'Failed to locate cbpp-include.cfg in PATH' >&2
