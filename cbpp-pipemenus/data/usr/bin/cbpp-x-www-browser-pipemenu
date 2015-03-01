@@ -46,7 +46,7 @@ addAptKey() {
     return 0
 }
 
-setupGooglechromestable() {
+setupGoogleChromeStable() {
     addAptKey "${KEY_URLS_GOOGLE[@]}" || return 1
     say 'Creating APT sources file...' 1
     echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee '/etc/apt/sources.list.d/google-chrome.list'
@@ -59,18 +59,18 @@ setupOpera() {
 }
 
 if [[ $1 && ! $1 =~ --install-* ]]; then
-    browserExists "${1:2}" || exit 1
-    browserName=${1:2}
-    browserName=${browserName//-/ }
-    terminator --title="Install ${browserName~}" --command="cbpp-x-www-browser-pipemenu --install-${1:2}"
+    browserName=${1#--}
+    browserExists "$browserName" || exit 1
+    read -ra words <<< "${browserName//-/ }"
+    terminator --title="Install ${words[*]^}" --command="cbpp-x-www-browser-pipemenu --install-$browserName"
     
 elif [[ $1 = --install-* ]]; then
     packageName=${1#--install-}
-    browserName=${packageName//-/ }
-    browserName=${browserName~}
-    browserNameUpper=${browserName^^}
-    
     browserExists "$packageName" || exit 1
+    browserName=${packageName//-/ }
+    read -ra words <<< "$browserName"
+    browserName=${words[*]^}
+    browserNameUpper=${browserName^^}
 
     while true; do # do it until the package is successfully installed or user wants to exit
         if [[ $TRYAGAIN ]]; then # previous try failed
@@ -116,8 +116,8 @@ elif [[ $1 = --install-* ]]; then
 else # pipemenu
     menuStart
     for curTool in "${TOOLS[@]}"; do
-        curToolName=${curTool//-/ }
-        curToolName=${curToolName~}
+        read -ra words <<< "${curTool//-/ }"
+        curToolName=${words[*]^}
         if type "$curTool" &> /dev/null; then
             INSTALLED=true
             menuItem "$curToolName" "$curTool"
