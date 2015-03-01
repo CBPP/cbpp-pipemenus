@@ -28,7 +28,7 @@ else
     menuStart
 
     # Viewer
-    if [[ -x /usr/bin/xtightvncviewer ]]; then
+    if type 'xtightvncviewer' &> /dev/null; then
         menuItem 'Viewer' 'vncviewer'
     else
         menuItem 'Install Viewer' 'cbpp-remote-desktop-pipemenu --viewer'

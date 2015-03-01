@@ -21,7 +21,7 @@ elif [[ $1 = '--install-printing' ]]; then
 else
     # Pipemenu
     menuStart
-    if [[ -x /usr/bin/system-config-printer ]]; then
+    if type 'system-config-printer' &> /dev/null; then
         menuItem 'Configure Printers' 'gksudo system-config-printer'
     else
         menuItem 'Install Printing Support' 'cbpp-printing-pipemenu --install'

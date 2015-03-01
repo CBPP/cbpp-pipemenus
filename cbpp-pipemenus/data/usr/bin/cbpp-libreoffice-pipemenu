@@ -25,7 +25,7 @@ else
     tools=('writer' 'calc' 'impress' 'draw' 'base')
 
     for curTool in "${tools[@]}"; do
-        if [[ -x /usr/bin/lo$curTool ]]; then
+        if type "lo$curTool" &> /dev/null; then
             INSTALLED=true
             menuItem "${curTool^}" "lo$curTool"
         fi

@@ -118,7 +118,7 @@ else # pipemenu
     for curTool in "${TOOLS[@]}"; do
         curToolName=${curTool//-/ }
         curToolName=${curToolName~}
-        if [[ -x /usr/bin/$curTool ]]; then
+        if type "$curTool" &> /dev/null; then
             INSTALLED=true
             menuItem "$curToolName" "$curTool"
             [[ $curToolName =~ 'Chrom' ]] &&
