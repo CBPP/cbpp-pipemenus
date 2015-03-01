@@ -2,414 +2,136 @@
 # ---------------------------------------------------------------------
 # Written for CrunchBang Linux <http://crunchbang.org/>
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
-# updated by Ben Young <computermouth@crunchbangplusplus.org>
-# for #!++ <https://crunchbangplusplus.org>
+# Ported to #!++ <https://crunchbangplusplus.org>
+# by Ben Young <computermouth@crunchbangplusplus.org>
 # ---------------------------------------------------------------------
 
-pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
 
-if [[ -f $pathto/cbpp-include.cfg ]]
-then
-    source "$pathto/cbpp-include.cfg"
-else
-    echo "  Failed to locate cbpp-include.cfg"
+# In order to add another browser, simply add it to this array:
+TOOLS=('chromium' 'iceweasel' 'google-chrome-stable' 'opera')
+# If the package needs additional configuration before installation simply create a function called setupBrowserName, it will be called automatically.
+
+KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key')
+KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key')
+
+if ! . cbpp-include.cfg 2> /dev/null; then
+    say 'Failed to locate cbpp-include.cfg in PATH' >&2
     exit 1
 fi
 
-google_key_url_1='https://dl-ssl.google.com/linux/linux_signing_key.pub'
-google_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key'
-opera_key_url_1='http://deb.opera.com/archive.key'
-opera_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key'
-I=0
+browserExists() {
+    for curTool in "${TOOLS[@]}"; do # if $packageName exists in tools array
+        [[ $curTool = "$1" ]] &&
+            return 0
+    done
+    say "Unable to install $1. There is no such browser that I know of." >&2
+    say "You can try one of these: ${TOOLS[@]}" >&2
+    return 1
+}
 
-if [ "$1" = "--chromium-browser" ]; then
-    terminator --title="Install Chromium Browser" --command="cbpp-x-www-browser-pipemenu --install-chromium-browser"
-    exit 0
-fi
-
-if [ "$1" = "--iceweasel" ]; then
-    terminator --title="Install Iceweasel Browser" --command="cbpp-x-www-browser-pipemenu --install-iceweasel"
-    exit 0
-fi
-
-if [ "$1" = "--google-chrome" ]; then
-    terminator --title="Install Google Chrome" --command="cbpp-x-www-browser-pipemenu --install-google-chrome"
-    exit 0
-fi
-
-if [ "$1" = "--opera" ]; then
-    terminator --title="Install Opera Browser" --command="cbpp-x-www-browser-pipemenu --install-opera"
-    exit 0
-fi
-
-if [ "$1" = "--install-chromium-browser" ]; then
+addAptKey() {
     clear
-    echo ""
-    echo "  INSTALL CHROMIUM BROWSER"
-    echo "  ------------------------"
-    echo "  This script will install Chromium."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
-    read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
-        
-        connectiontest
-        clear
-        echo "  Updating sources..."
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        
-        if ! sudo apt-get install -y chromium; then
-            clear
-            echo ""
-            echo "  There was a problem installing Chromium."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
-            read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
-                clear
-                exit 0
-            else
-                cbpp-x-www-browser-pipemenu --install-chromium-browser
-                exit 0
-            fi
-        else
-            clear
-            echo ""
-            echo "  Chromium has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
-            read -n1 a
-            exit 0
-        fi
-    else
-        exit 0
+    say 'Adding APT key...'
+    keyFile=$(mktemp -u)
+    for curKey; do
+        wget -O "$keyFile" "$curKey" 2> /dev/null && break; # success. No need to try other keys
+        say "Failed to retrieve key from $curKey . Trying another source..."
+    done
+    if [[ $? != 0 ]]; then
+        say 'Failed to retrieve APT key!' >&2
+        return 1
     fi
-fi
+    sudo apt-key add "$keyFile"
+    rm -f "$keyFile"
+    return 0
+}
 
-if [ "$1" = "--install-iceweasel" ]; then
-    clear
-    echo ""
-    echo "  INSTALL ICEWEASEL BROWSER"
-    echo "  -------------------------"
-    echo "  This script will install Iceweasel."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
-    read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
+setupGooglechromestable() {
+    addAptKey "${KEY_URLS_GOOGLE[@]}" || return 1
+    say 'Creating APT sources file...' 1
+    echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee '/etc/apt/sources.list.d/google-chrome.list'
+}
+
+setupOpera() {
+    addAptKey "${KEY_URLS_OPERA[@]}" || return 1
+    say 'Creating APT sources file...' 1
+    echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee '/etc/apt/sources.list.d/opera.list'
+}
+
+if [[ $1 && ! $1 =~ --install-* ]]; then
+    browserExists "${1:2}" || exit 1
+    browserName=${1:2}
+    browserName=${browserName//-/ }
+    terminator --title="Install ${browserName~}" --command="cbpp-x-www-browser-pipemenu --install-${1:2}"
+    
+elif [[ $1 = --install-* ]]; then
+    packageName=${1#--install-}
+    browserName=${packageName//-/ }
+    browserName=${browserName~}
+    browserNameUpper=${browserName^^}
+    
+    browserExists "$packageName" || exit 1
+
+    while true; do # do it until the package is successfully installed or user wants to exit
+        if [[ $TRYAGAIN ]]; then # previous try failed
+            say
+            say "There was a problem installing $browserName."
+            say
+            prompt '  Hit any key to try again, or "q" to quit...' Q && break
+        fi
+        TRYAGAIN=true
         
-        connectiontest
         clear
-        echo "  Updating sources..."
-		sleep 2s
-		sudo apt-get update
-		clear
+        say
+        say "INSTALL ${browserNameUpper% BROWSER} BROWSER"
+        say '------------------------'
+        say "This script will install $browserName."
+        say
+        prompt '  Run the installer now?' || break
         
-        
-        if ! sudo apt-get install -y iceweasel; then
-            clear
-            echo ""
-            echo "  There was a problem installing Iceweasel."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
-            read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
-                clear
-                exit 0
-            else
-                cbpp-x-www-browser-pipemenu --install-iceweasel
-                exit 0
-            fi
-        else
-            clear
-            echo ""
-            echo "  Iceweasel has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
-            read -n1 a
-            exit 0
-        fi
-    else
-        exit 0
-    fi
-fi
-
-if [ "$1" = "--install-google-chrome" ]; then
-    clear
-    echo ""
-    echo "  INSTALL GOOGLE CHROME WWW BROWSER"
-    echo "  ---------------------------------"
-    echo "  This script will install Google Chrome."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
-    read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
-        
-        connectiontest
-        
-        #add apt-key
         clear
-        echo "  Adding APT key..."
-        sleep 2s
-        if ! wget -O google.key ${google_key_url_1} 2> /dev/null
-        then
-            # Fallback to packages.crunchbang.org.
-            if ! wget -O google.key ${google_key_url_2} 2> /dev/null
-            then
-                echo "  Failed to retrieve APT key from Google Inc."
-                clear
-                exit 1
-            fi
+        connectiontest 1 || continue
+        
+        setupFunctionName="setup${browserName//[^a-zA-Z]/}" # setupFunctionName should now be in format like 'setupChromiumBrowser'
+        if [[ $(type -t "$setupFunctionName") == 'function' ]]; then
+            "$setupFunctionName" || continue # run setup function if it exists
         fi
-        sudo apt-key add google.key
-        rm -f google.key
         
-        #create sources file
-        echo "  Creating APT sources file..."
-        sleep 2s
-        if [ -f "/etc/apt/sources.list.d/google-chrome.list" ]; then
-            sudo rm -f /etc/apt/sources.list.d/google-chrome.list
-        fi
-        echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
-        
-        #update sources
-        echo "  Updating sources..."
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        
-        if ! sudo apt-get install -y google-chrome-stable; then
-            clear
-            echo ""
-            echo "  There was a problem installing Google Chrome."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
-            read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
-                clear
-                exit 0
-            else
-                cbpp-x-www-browser-pipemenu --install-google-chrome
-                exit 0
-            fi
-        else
-            clear
-            echo ""
-            echo "  Google Chrome has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
-            read -n1 a
-            exit 0
-        fi
-    else
-        exit 0
-    fi
-fi
-
-if [ "$1" = "--install-opera" ]; then
-    clear
-    echo ""
-    echo "  INSTALL OPERA WWW BROWSER"
-    echo "  -------------------------"
-    echo "  This script will install Opera."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
-    read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
-        
-        connectiontest
-        
-        #add apt-key
         clear
-        echo "  Adding APT key..."
-        sleep 2s
-        if ! wget -O opera.key ${opera_key_url_1} 2> /dev/null
-        then
-            # Fallback to packages.crunchbang.org.
-            if ! wget -O opera.key ${opera_key_url_2} 2> /dev/null
-            then
-                echo "  Failed to retrieve APT key from Opera Software ASA."
-                clear
-                exit 1
-            fi
-        fi
-        sudo apt-key add opera.key
-        rm -f opera.key
+        say 'Updating sources...' 1
+        sudo apt-get update
         
-        #create sources file
-        echo "  Creating APT sources file..."
-        sleep 2s
-        if [ -f "/etc/apt/sources.list.d/opera.list" ]; then
-            sudo rm -f /etc/apt/sources.list.d/opera.list
-        fi
-        echo "deb http://deb.opera.com/opera/ stable non-free" | sudo tee -a /etc/apt/sources.list.d/opera.list
-        #update sources
-        echo "  Updating sources..."
-		sleep 2s
-		sudo apt-get update
-		clear
+        clear
+        say 'Installing package...' 1
+        sudo apt-get install -y "$packageName" || continue
         
-        
-        if ! sudo apt-get install -y opera; then
-            clear
-            echo ""
-            echo "  There was a problem installing Opera."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
-            read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
-                clear
-                exit 0
-            else
-                cbpp-x-www-browser-pipemenu --install-opera
-                exit 0
-            fi
+        clear
+        say
+        say "$browserName has been installed successfully."
+        say
+        say 'Hit any key to exit...'
+        read -srn1
+        break
+    done
+else # pipemenu
+    menuStart
+    for curTool in "${TOOLS[@]}"; do
+        curToolName=${curTool//-/ }
+        curToolName=${curToolName~}
+        if [[ -x /usr/bin/$curTool ]]; then
+            INSTALLED=true
+            menuItem "$curToolName" "$curTool"
+            [[ $curToolName =~ 'Chrom' ]] &&
+                menuItem "$curToolName (Private Mode)" "$curTool --incognito" # Incognito mode for chrome and chromium
         else
-            clear
-            echo ""
-            echo "  Opera has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
-            read -n1 a
-            exit 0
+            menuItem "Install $curToolName" "cbpp-x-www-browser-pipemenu --$curTool"
         fi
-    else
-        exit 0
+    done
+
+    if [[ $INSTALLED ]]; then
+        menuSeparator
+        menuItem 'Select default browser' 'terminator --command="sudo update-alternatives --config x-www-browser"'
     fi
+    menuEnd
 fi
-# Start pipemenu
-echo "    <openbox_pipe_menu>"
-
-# Chromium
-if [ -x "/usr/bin/chromium" ];then
-    I=$((I+1))
-    cat << _menu_
-	    <item label="Chromium Browser">
-            <action name="Execute">
-				<command>
-					chromium
-				</command>
-			</action>
-		</item>
-		<item label="Chromium Browser (Private Mode)">
-            <action name="Execute">
-				<command>
-					chromium --incognito
-				</command>
-			</action>
-		</item>
-_menu_
-else
-	cat << _menu_
-	    <item label="Install Chromium Browser">
-            <action name="Execute">
-				<command>
-					cbpp-x-www-browser-pipemenu --chromium-browser
-				</command>
-			</action>
-		</item>
-_menu_
-fi
-
-# Iceweasel
-if [ -x "/usr/bin/iceweasel" ];then
-    I=$((I+1))
-    cat << _menu_
-	    <item label="Iceweasel">
-            <action name="Execute">
-				<command>
-					iceweasel
-				</command>
-			</action>
-		</item>
-_menu_
-else
-	cat << _menu_
-	    <item label="Install Iceweasel">
-            <action name="Execute">
-				<command>
-					cbpp-x-www-browser-pipemenu --iceweasel
-				</command>
-			</action>
-		</item>
-_menu_
-fi
-
-# Google Chrome
-if [ -x "/usr/bin/google-chrome" ];then
-    I=$((I+1))
-    cat << _menu_
-	    <item label="Google Chrome">
-            <action name="Execute">
-				<command>
-					google-chrome
-				</command>
-			</action>
-		</item>
-		<item label="Google Chrome (Private Mode)">
-            <action name="Execute">
-				<command>
-					google-chrome --incognito
-				</command>
-			</action>
-		</item>
-_menu_
-else
-	cat << _menu_
-	    <item label="Install Google Chrome">
-            <action name="Execute">
-				<command>
-					cbpp-x-www-browser-pipemenu --google-chrome
-				</command>
-			</action>
-		</item>
-_menu_
-fi
-
-# Opera
-if [ -x "/usr/bin/opera" ];then
-    I=$((I+1))
-    cat << _menu_
-	    <item label="Opera">
-            <action name="Execute">
-				<command>
-					opera
-				</command>
-			</action>
-		</item>
-_menu_
-else
-	cat << _menu_
-	    <item label="Install Opera">
-            <action name="Execute">
-				<command>
-					cbpp-x-www-browser-pipemenu --opera
-				</command>
-			</action>
-		</item>
-_menu_
-fi
-
-# Configure default
-if [ $I -gt 1 ];then
-    cat << _menu_
-	    <separator/>
-	    <item label="Select default browser">
-            <action name="Execute">
-				<command>
-					terminator --command="sudo update-alternatives --config x-www-browser"
-				</command>
-			</action>
-		</item>
-_menu_
-fi
-# End pipemenu
-echo "    </openbox_pipe_menu>"
 exit 0

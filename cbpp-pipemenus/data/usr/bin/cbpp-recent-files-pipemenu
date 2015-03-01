@@ -1,5 +1,5 @@
 #!/bin/sh
-#    cbpp-recent-files-pipemenu - a script to parse .recently-used.xbel
+#    cb-recent-files-pipemenu - a script to parse .recently-used.xbel
 #    and generate openbox pipe menu
 #    Copyright (C) 2010  John Crawley
 #
@@ -13,6 +13,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #    version 2012/07/01-cb
+
+# Ported to #!++ <https://crunchbangplusplus.org>
+# by Ben Young <computermouth@crunchbangplusplus.org>
 
 # Usage: add
 # <menu id="recent" label="Recent Files" execute="/path/to/cbpp-recent-files-pipemenu" />
