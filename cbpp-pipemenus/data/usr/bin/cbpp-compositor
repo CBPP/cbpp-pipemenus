@@ -23,13 +23,13 @@ fi
 if [[ $1 = '--edit' ]]; then
     [[ ! -f $HOME/.config/compton.conf ]] &&
         cp '/etc/xdg/compton.conf' "$HOME/.config/compton.conf"
-    
+
     if [[ -x /usr/bin/geany ]]; then
         geany "$HOME/.config/compton.conf" &
     else
         terminator --command='nano "$HOME/.config/compton.conf"'
     fi
-elif [[ $1 = '--toggle' || $1 = '--start' ]]; then # Toggle compositing with compton. 
+elif [[ $1 = '--toggle' || $1 = '--start' ]]; then # Toggle compositing with compton.
     # TODO why --toggle and --start act exactly the same?
     if ! pidof compton > /dev/null; then
         $EXECXCOMP &
@@ -41,10 +41,10 @@ elif [[ $1 = '--restart' ]]; then
     for (( i=0; i < RESTART_ATTEMPTS; i++ )); do
         pidof compton > /dev/null || # no process found! Safe to start again
             break
-            
+
         (( i == RESTART_ATTEMPTS - 1 )) && # still didn't die? Probably hangs. Force it to die!
             killall -q -S KILL compton
-            
+
         sleep 0.25
     done
     cbpp-compositor --start

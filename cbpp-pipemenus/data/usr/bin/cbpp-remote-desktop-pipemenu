@@ -13,16 +13,16 @@ fi
 
 if [[ $1 = '--viewer' ]]; then
     terminator --title='Install VNC Viewer' --command='cbpp-remote-desktop-pipemenu --install-viewer'
-    
+
 elif [[ $1 = '--server' ]]; then
     terminator --title='Install VNC Server' --command='cbpp-remote-desktop-pipemenu --install-server'
-    
+
 elif [[ $1 = '--install-viewer' ]]; then
     promptInstall 'REMOTE DESKTOP CLIENT' 'TightVNC Viewer' 'xtightvncviewer'
-    
+
 elif [[ $1 = '--install-server' ]]; then
     promptInstall  'REMOTE DESKTOP SERVER' 'Vino VNC server' 'vino'
-    
+
 else
     # Pipemenu
     menuStart
