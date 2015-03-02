@@ -14,10 +14,10 @@ fi
 
 if [[ $1 = '--install' ]]; then
     terminator --title='Install Printer Support' --command='cbpp-printing-pipemenu --install-printing'
-    
+
 elif [[ $1 = '--install-printing' ]]; then
     promptInstall 'PRINTING SUPPORT' 'printing support' 'cbpp-meta-printer-support'
-    
+
 else
     # Pipemenu
     menuStart

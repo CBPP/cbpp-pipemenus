@@ -28,37 +28,37 @@ fi
 
 if [[ $1 = '--start-dropbox' ]]; then
     "$USERDBDIR/dropboxd" &
-    
+
 elif [[ $1 = '--stop-dropbox' ]]; then
     killall dropbox
-    
+
 elif [[ $1 = '--install-dropbox' ]]; then
     zenity --question --title='Dropbox Installation' --text 'This script will install Dropbox.\nDo you want to proceed?' || exit 0
-    
+
     if ! cd "$HOME"; then # TODO Change directory? What for? Better use absolute paths
         echo "Unable to change directory to $HOME"
         exit 1
     fi
-    
+
     platform=$(uname -m)
     platform=${platform,,}
-    
+
     case $platform in
-    'x86_64')
-        #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz'
-        DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86_64'
-        ;;
-    *)
-        #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/32/dropbox.tar.gz'
-        DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86'
-        ;;
+        'x86_64')
+            #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz'
+            DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86_64'
+            ;;
+        *)
+            #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/32/dropbox.tar.gz'
+            DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86'
+            ;;
     esac
-    
+
     shitTemp=$(mktemp -u)
     curl -s -I "$DROPBOXURL" > "$shitTemp"
     if [[ $? = 0 ]]; then # TODO this check is just wrong. It doesn't even make sure if it is possible to download a file or not.
         read _ RESPONSE _ <<< $(head -n 1 "$shitTemp")
-        
+
         #if [ $RESPONSE -ne "200" ]; then
         if [[ RESPONSE != 302 ]]; then
             zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
@@ -66,19 +66,19 @@ elif [[ $1 = '--install-dropbox' ]]; then
         else
             dropboxFile=$(mktemp -u)
             wget "$DROPBOXURL" -O "$dropboxFile" 2>&1 | \
-             sed -u 's/^.* \+\([0-9]\+%\) \+\([0-9.]\+[GMKB]\) \+\([0-9hms.]\+\).*$/\1\n# Downloading... \2 (\3)/' | \
-             zenity --progress --title='Installing Dropbox' --auto-kill --auto-close
+                sed -u 's/^.* \+\([0-9]\+%\) \+\([0-9.]\+[GMKB]\) \+\([0-9hms.]\+\).*$/\1\n# Downloading... \2 (\3)/' | \
+                zenity --progress --title='Installing Dropbox' --auto-kill --auto-close
         fi
     else
         zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
         exit 1
     fi
-    
+
     #extract binary
     tar -xf "$dropboxFile"
     #delete binary archive
     rm "$dropboxFile"
-    
+
     #quick sanity check
     if [[ ! -x $USERDBDIR/dropboxd ]]; then
         zenity --warning --title='Dropbox Installation' --text 'Oops! There was an error, Dropbox could not be installed. Sorry.'
@@ -96,7 +96,7 @@ elif [[ $1 = '--install-dropbox' ]]; then
         fi
     fi
     zenity --question --title='Dropbox Installation' --text 'Do you wish to start the Dropbox client now?' || exit 0
-    
+
     "$USERDBDIR/dropboxd" &
 else
     # pipemenu stuff
@@ -108,7 +108,7 @@ else
     else
         [[ -d $HOME/Dropbox ]] &&
             menuItem 'Open Dropbox Folder' 'thunar $HOME/Dropbox'
-        
+
         if ! pidof dropbox > /dev/null; then
             menuItem 'Start Dropbox' 'cbpp-dropbox-pipemenu --start-dropbox'
         else

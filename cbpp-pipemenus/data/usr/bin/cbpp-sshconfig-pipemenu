@@ -29,7 +29,7 @@ else:
 	config = SSHConfig()
 	config.parse(config_file)
 	hosts = config._config
-	
+
 print '<openbox_pipe_menu>\n'
 
 if len(hosts) >= 2:
@@ -69,5 +69,3 @@ print '    </action>'
 print '</item>\n'
 
 print '</openbox_pipe_menu>'
-
-

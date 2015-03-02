@@ -63,7 +63,7 @@ if [[ $1 && ! $1 =~ --install-* ]]; then
     browserExists "$browserName" || exit 1
     read -ra words <<< "${browserName//-/ }"
     terminator --title="Install ${words[*]^}" --command="cbpp-x-www-browser-pipemenu --install-$browserName"
-    
+
 elif [[ $1 = --install-* ]]; then
     packageName=${1#--install-}
     browserExists "$packageName" || exit 1
@@ -80,7 +80,7 @@ elif [[ $1 = --install-* ]]; then
             prompt '  Hit any key to try again, or "q" to quit...' Q && break
         fi
         TRYAGAIN=true
-        
+
         clear
         say
         say "INSTALL ${browserNameUpper% BROWSER} BROWSER"
@@ -88,23 +88,23 @@ elif [[ $1 = --install-* ]]; then
         say "This script will install $browserName."
         say
         prompt '  Run the installer now?' || break
-        
+
         clear
         connectiontest 1 || continue
-        
+
         setupFunctionName="setup${browserName//[^a-zA-Z]/}" # setupFunctionName should now be in format like 'setupChromiumBrowser'
         if [[ $(type -t "$setupFunctionName") == 'function' ]]; then
             "$setupFunctionName" || continue # run setup function if it exists
         fi
-        
+
         clear
         say 'Updating sources...' 1
         sudo apt-get update
-        
+
         clear
         say 'Installing package...' 1
         sudo apt-get install -y "$packageName" || continue
-        
+
         clear
         say
         say "$browserName has been installed successfully."

@@ -36,16 +36,16 @@ elif [ -r "${HOME}/.recently-used.xbel" ]
 then
     file_path="${HOME}/.recently-used.xbel"
 else
-	echo "$0: cannot find a readable recently-used.xbel file" >&2
-	echo '<openbox_pipe_menu>
+    echo "$0: cannot find a readable recently-used.xbel file" >&2
+    echo '<openbox_pipe_menu>
 <separator label="No recently-used.xbel file found." />
 </openbox_pipe_menu>'
-	exit 1
+    exit 1
 fi
 
 # if argument is --clear, empty .recently-used.xbel
 [ "$1" = '--clear' ] && {
-cat <<':EOF' > "${file_path}"
+    cat <<':EOF' > "${file_path}"
 <?xml version="1.0" encoding="UTF-8"?>
 <xbel version="1.0"
       xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
@@ -53,7 +53,7 @@ cat <<':EOF' > "${file_path}"
 >
 </xbel>
 :EOF
-exit
+    exit
 }
 
 maximum_entries=$((maximum_entries+2))
