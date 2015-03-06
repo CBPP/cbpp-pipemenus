@@ -1,7 +1,10 @@
 cbpp-pipemenus (1.0) unstable; urgency=low
 
   * Initial Release.
-  * Updated debain standards and changed branding.
+  * Updated debian standards and changed branding.
+  * Removed original #! server calls, replaced with CBPP server calls.
+  * Updated package detection, pipemenu name rendering, and other misc. code changes via AlexDaniel.
+  * Updated several package names.
 
  -- crunch <crunch@crunchbang>  Tue, 24 Feb 2015 11:08:56 -0600
 
