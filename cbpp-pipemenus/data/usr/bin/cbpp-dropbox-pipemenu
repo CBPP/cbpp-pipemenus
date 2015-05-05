@@ -46,11 +46,11 @@ elif [[ $1 = '--install-dropbox' ]]; then
     case $platform in
         'x86_64')
             #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz'
-            DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86_64'
+            DROPBOXURL='https://www.dropbox.com/download?plat=lnx.x86_64'
             ;;
         *)
             #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/32/dropbox.tar.gz'
-            DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86'
+            DROPBOXURL='https://www.dropbox.com/download?plat=lnx.x86'
             ;;
     esac
 
@@ -60,7 +60,7 @@ elif [[ $1 = '--install-dropbox' ]]; then
         read _ RESPONSE _ <<< $(head -n 1 "$shitTemp")
 
         #if [ $RESPONSE -ne "200" ]; then
-        if [[ RESPONSE != 302 ]]; then
+        if [[ $RESPONSE != 302 ]]; then
             zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
             exit 1
         else
