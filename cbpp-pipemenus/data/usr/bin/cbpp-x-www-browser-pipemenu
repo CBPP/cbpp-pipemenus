@@ -8,7 +8,7 @@
 
 
 # In order to add another browser, simply add it to this array:
-TOOLS=('chromium' 'iceweasel' 'google-chrome-stable' 'opera')
+TOOLS=('chromium' 'firefox' 'google-chrome-stable' 'opera')
 # If the package needs additional configuration before installation simply create a function called setupBrowserName, it will be called automatically.
 
 KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbangplusplus.org/chrome.pub')
