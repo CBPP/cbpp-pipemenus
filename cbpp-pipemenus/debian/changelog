@@ -1,4 +1,11 @@
+cbpp-pipemenus (10.0) unstable; urgency=low
+
+  * Updated package standards
+
+ -- computermouth <computermouth@crunchbangplusplus.org>  Sun, 12 May 2019 11:58:56 -0800
+
 cbpp-pipemenus (9.0) unstable; urgency=low
+
   * Nine it!
   * Iceweasel -> Firefox
 
@@ -13,8 +20,6 @@ cbpp-pipemenus (1.2) unstable; urgency=low
 cbpp-pipemenus (1.1) unstable; urgency=low
 
   * Dropbox pipemenu fixed
-
- -- computermouth <computermouth@crunchbangplusplus.org>  Tue, 24 Feb 2015 11:08:56 -0600
 
  -- computermouth <computermouth@crunchbangplusplus.org>  Tue, 24 Feb 2015 11:08:56 -0600
 
