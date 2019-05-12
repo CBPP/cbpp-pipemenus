@@ -1,6 +1,15 @@
+cbpp-pipemenus (1.2) unstable; urgency=low
+
+  * Iceweasel instances replaced with Firefox
+
+ -- computermouth <computermouth@crunchbangplusplus.org>  Sun, 26 June 2016 18:08:56 -0600
+
 cbpp-pipemenus (1.1) unstable; urgency=low
+
   * Dropbox pipemenu fixed
 	- Thanks /u/xa2rd!
+
+ -- computermouth <computermouth@crunchbangplusplus.org>  Tue, 24 Feb 2015 11:08:56 -0600
 
 cbpp-pipemenus (1.0) unstable; urgency=low
 
