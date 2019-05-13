@@ -22,7 +22,7 @@ else
     # Pipemenu
     menuStart
     if type 'system-config-printer' &> /dev/null; then
-        menuItem 'Configure Printers' 'gksudo system-config-printer'
+        menuItem 'Configure Printers' 'cbpp-gksudo system-config-printer'
     else
         menuItem 'Install Printing Support' 'cbpp-printing-pipemenu --install'
     fi
