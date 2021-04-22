@@ -2,13 +2,13 @@ Source: cbpp-pipemenus
 Section: misc
 Priority: extra
 Maintainer: Ben Young <computermouth@crunchbangplusplus.org>
-Build-Depends: debhelper (>= 11)
+Build-Depends: debhelper (>= 13)
 Standards-Version: 3.9.8
 Homepage: https://crunchbangplusplus.org/
 
 Package: cbpp-pipemenus
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton, curl, tar, python, python-paramiko, mesa-utils
+Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton, curl, tar, python3, mesa-utils
 Description: various Openbox pipemenus.
  Contains various Openbox pipemenus for use with
  CBPP.
