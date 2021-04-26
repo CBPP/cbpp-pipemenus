@@ -1,3 +1,10 @@
+cbpp-pipemenus (11.0) unstable; urgency=low
+
+  * Updated package standards
+  * Fix up the ssh pipemenu and dependencies
+
+ -- computermouth <computermouth@crunchbangplusplus.org>  Thu, 22 Apr 2021 13:17:16 -0800
+
 cbpp-pipemenus (10.0) unstable; urgency=low
 
   * Updated package standards
