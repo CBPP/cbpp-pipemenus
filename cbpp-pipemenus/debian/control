@@ -8,7 +8,7 @@ Homepage: https://crunchbangplusplus.org/
 
 Package: cbpp-pipemenus
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton, curl, tar, python3, mesa-utils
+Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton, curl, tar, python3, python3-paramiko, mesa-utils
 Description: various Openbox pipemenus.
  Contains various Openbox pipemenus for use with
  CBPP.
