@@ -21,7 +21,7 @@ else
     e_current='None'
     e_modes=('No Modes Detected')
     
-    current=$(powerprofilesctl list | grep '|' | tr -d '* :')
+    current=$(powerprofilesctl list | grep '*' | tr -d '* :')
     if [ "x$current" == "x" ]; then
 		current=$e_current
     fi
