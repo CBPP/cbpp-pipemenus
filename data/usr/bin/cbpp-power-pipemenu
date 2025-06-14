@@ -1,0 +1,49 @@
+#!/bin/bash
+# ---------------------------------------------------------------------
+# An Openbox pipemenu for use with powerprofilesctl.
+# Written for CrunchBangPlusPlus (#!++) <https://crunchbangplusplus.org>
+# by Ben Young <computermouth@crunchbangplusplus.org>
+# ---------------------------------------------------------------------
+
+if ! . cbpp-include.cfg 2> /dev/null; then
+    echo '  Failed to locate cbpp-include.cfg in PATH' >&2
+    exit 1
+fi
+
+if [[ $1 = '--install' ]]; then
+    x-terminal-emulator --title='Install PPD' --command='cbpp-power-pipemenu --install-ppd'
+
+elif [[ $1 = '--install-ppd' ]]; then
+    promptInstall 'PPD' 'Power Profiles Daemon' 'power-profiles-daemon'
+
+else
+    
+    e_current='None'
+    e_modes=('No Modes Detected')
+    
+    current=$(powerprofilesctl list | grep '|' | tr -d '* :')
+    if [ "x$current" == "x" ]; then
+		current=$e_current
+    fi
+    
+    modes=$(powerprofilesctl | sed -n -E 's/^[ *]*([a-zA-Z-]+):$/\1/p')
+    if [ "x$modes" == "x" ]; then
+		modes=$e_modes
+    fi
+    
+    # Pipemenu
+    menuStart
+    menuSeparator "Current Mode: $current"
+    
+    for mode in $modes; do
+		title=" "
+		if [ "x$mode" == "x$current" ]; then
+			title="*"
+		fi
+		menuItem "$title $mode" "powerprofilesctl set $mode"
+    done
+    
+    menuEnd
+    
+fi
+exit 0
