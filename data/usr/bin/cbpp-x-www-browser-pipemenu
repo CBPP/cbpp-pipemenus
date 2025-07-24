@@ -12,7 +12,6 @@ TOOLS=('chromium' 'firefox' 'google-chrome-stable')
 # If the package needs additional configuration before installation simply create a function called setupBrowserName, it will be called automatically.
 
 KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbangplusplus.org/chrome.pub')
-KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbangplusplus.org/opera.key')
 
 if ! . cbpp-include.cfg 2> /dev/null; then
     say 'Failed to locate cbpp-include.cfg in PATH' >&2
@@ -41,7 +40,7 @@ addAptKey() {
         say 'Failed to retrieve APT key!' >&2
         return 1
     fi
-    sudo apt-key add "$keyFile"
+    sudo mv "$keyFile" "/etc/apt/trusted.gpg.d/$(basename $keyFile).asc"
     rm -f "$keyFile"
     return 0
 }
@@ -51,13 +50,6 @@ setupGoogleChromeStable() {
     say 'Creating APT sources file...' 1
     echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee '/etc/apt/sources.list.d/google-chrome.list'
 }
-
-# opera has broken dependency chain in stretch
-#setupOpera() {
-#    addAptKey "${KEY_URLS_OPERA[@]}" || return 1
-#    say 'Creating APT sources file...' 1
-#    echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee '/etc/apt/sources.list.d/opera.list'
-#}
 
 if [[ $1 && ! $1 =~ --install-* ]]; then
     browserName=${1#--}
