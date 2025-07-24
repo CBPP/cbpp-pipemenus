@@ -1,6 +1,6 @@
 cbpp-pipemenus (13.0) unstable; urgency=low
 
-  * Version bump
+  * New power pipemenu
   * Chrome pipemenu fix
   * Removing the VNC pipemenu
 
