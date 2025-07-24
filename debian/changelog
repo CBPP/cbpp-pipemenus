@@ -2,6 +2,7 @@ cbpp-pipemenus (13.0) unstable; urgency=low
 
   * Version bump
   * Chrome pipemenu fix
+  * Removing the VNC pipemenu
 
  -- computermouth <computermouth@crunchbangplusplus.org>  Sun, 08 Jun 2025 16:29:16 -0800
 
